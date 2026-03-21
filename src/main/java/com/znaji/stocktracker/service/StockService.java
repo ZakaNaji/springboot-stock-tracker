@@ -1,7 +1,7 @@
 package com.znaji.stocktracker.service;
 
-import com.znaji.stocktracker.dto.response.StockQuoteResponse;
+import com.znaji.stocktracker.model.StockQuote;
 
 public interface StockService {
-    StockQuoteResponse getStockQuote(String symbol);
+    StockQuote getStockQuote(String symbol);
 }
