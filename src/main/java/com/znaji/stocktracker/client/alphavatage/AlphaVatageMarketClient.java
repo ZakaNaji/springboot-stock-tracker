@@ -5,10 +5,12 @@ import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageQuoteResponse;
 import com.znaji.stocktracker.client.alphavatage.mapper.AlphaVantageQuoteMapper;
 import com.znaji.stocktracker.exception.StockNotFoundException;
 import com.znaji.stocktracker.model.StockQuote;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
+@Log4j2
 public class AlphaVatageMarketClient implements StockMarketClient {
 
     private final AlphaVantageProperties properties;
@@ -23,6 +25,7 @@ public class AlphaVatageMarketClient implements StockMarketClient {
 
     @Override
     public StockQuote getStockQuote(String symbol) {
+        log.info("Fetching stock quote for symbol: {}", symbol);
         AlphaVantageQuoteResponse alphaVantageQuote = restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("function", "GLOBAL_QUOTE")
