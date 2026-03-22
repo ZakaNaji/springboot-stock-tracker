@@ -26,6 +26,20 @@ public class GlobalExceptionHandler {
                 .body(buildErrorResponse(status, e.getMessage(), request));
     }
 
+    @ExceptionHandler(FavouriteStockExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleFavouriteStockExistsException(FavouriteStockExistsException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        return ResponseEntity.status(status)
+                .body(buildErrorResponse(status, e.getMessage(), request));
+    }
+
+    @ExceptionHandler(InvalidStockRequestException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidStockRequestException(InvalidStockRequestException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status)
+                .body(buildErrorResponse(status, e.getMessage(), request));
+    }
+
 
     private ApiErrorResponse buildErrorResponse(
             HttpStatus status,
