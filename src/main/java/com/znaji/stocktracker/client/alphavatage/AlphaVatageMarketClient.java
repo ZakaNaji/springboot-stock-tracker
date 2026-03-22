@@ -3,6 +3,7 @@ package com.znaji.stocktracker.client.alphavatage;
 import com.znaji.stocktracker.client.StockMarketClient;
 import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageQuoteResponse;
 import com.znaji.stocktracker.client.alphavatage.mapper.AlphaVantageQuoteMapper;
+import com.znaji.stocktracker.exception.StockNotFoundException;
 import com.znaji.stocktracker.model.StockQuote;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -31,6 +32,9 @@ public class AlphaVatageMarketClient implements StockMarketClient {
                 .retrieve()
                 .body(AlphaVantageQuoteResponse.class);
 
+        if (alphaVantageQuote == null || alphaVantageQuote.getGlobalQuote() == null) {
+            throw new StockNotFoundException(symbol);
+        }
         return mapper.toStockQuote(alphaVantageQuote);
     }
 }
