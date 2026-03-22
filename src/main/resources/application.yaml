@@ -5,3 +5,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+stock:
+  providers:
+    alphavantage:
+      api-key: ${ALPHAVANTAGE_API_KEY:}
+      base-url: https://www.alphavantage.co/query
