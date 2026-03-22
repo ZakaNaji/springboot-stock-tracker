@@ -6,6 +6,8 @@ import com.znaji.stocktracker.model.FavouriteStock;
 import com.znaji.stocktracker.service.FavouriteStockService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/favourites")
 public class FavouriteStockController {
@@ -16,8 +18,16 @@ public class FavouriteStockController {
         this.favouriteStoService = favouriteStoService;
     }
 
+    @GetMapping
+    public List<FavoriteStockResponse> getFavouriteStocks() {
+        List<FavouriteStock> stocks = favouriteStoService.getFavouriteStocks();
+        return stocks.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 
-    @PostMapping("/add")
+
+    @PostMapping("")
     public FavoriteStockResponse addFavouriteStock(@RequestBody FavouriteStockRequest request) {
         String symbol = request.symbol();
         FavouriteStock response = favouriteStoService.addFavouriteStock(symbol);
