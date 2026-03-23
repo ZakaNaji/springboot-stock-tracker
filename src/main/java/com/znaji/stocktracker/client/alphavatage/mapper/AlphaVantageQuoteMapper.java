@@ -1,7 +1,9 @@
 package com.znaji.stocktracker.client.alphavatage.mapper;
 
+import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageOverviewResponse;
 import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageQuoteResponse;
 import com.znaji.stocktracker.exception.StockProviderException;
+import com.znaji.stocktracker.model.StockOverview;
 import com.znaji.stocktracker.model.StockQuote;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +41,7 @@ public class AlphaVantageQuoteMapper {
     }
 
     private BigDecimal parseBigDecimal(String value) {
-        if (isBlank(value)) {
+        if (isBlank(value) || "None".equalsIgnoreCase(value)) {
             return null;
         }
         try {
@@ -86,4 +88,26 @@ public class AlphaVantageQuoteMapper {
         return value == null || value.isBlank();
     }
 
+    public StockOverview toStockOverview(AlphaVantageOverviewResponse response) {
+        if (response == null || isBlank(response.getSymbol())) {
+            throw new StockProviderException("Alpha Vantage returned an empty overview response");
+        }
+
+        return new StockOverview(
+                response.getSymbol(),
+                response.getName(),
+                response.getDescription(),
+                response.getExchange(),
+                response.getCurrency(),
+                response.getCountry(),
+                response.getSector(),
+                response.getIndustry(),
+                response.getOfficialSite(),
+                parseBigDecimal(response.getMarketCapitalization()),
+                parseBigDecimal(response.getPeRatio()),
+                parseBigDecimal(response.getEps()),
+                parseBigDecimal(response.getFiftyTwoWeekHigh()),
+                parseBigDecimal(response.getFiftyTwoWeekLow())
+        );
+    }
 }
