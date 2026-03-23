@@ -1,4 +1,4 @@
-package com.znaji.stocktracker.dto;
+package com.znaji.stocktracker.dto.response;
 
 import java.time.Instant;
 

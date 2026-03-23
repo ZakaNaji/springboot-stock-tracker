@@ -1,7 +1,7 @@
 package com.znaji.stocktracker.controller;
 
-import com.znaji.stocktracker.dto.FavoriteStockResponse;
-import com.znaji.stocktracker.dto.FavouriteStockRequest;
+import com.znaji.stocktracker.dto.response.FavoriteStockResponse;
+import com.znaji.stocktracker.dto.request.FavouriteStockRequest;
 import com.znaji.stocktracker.model.FavouriteStock;
 import com.znaji.stocktracker.service.FavouriteStockService;
 import org.springframework.web.bind.annotation.*;
