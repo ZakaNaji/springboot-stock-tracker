@@ -1,11 +1,14 @@
 package com.znaji.stocktracker.client.alphavatage;
 
 import com.znaji.stocktracker.client.StockMarketClient;
+import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageHistoryResponse;
 import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageOverviewResponse;
 import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageQuoteResponse;
+import com.znaji.stocktracker.client.alphavatage.mapper.AlphaVantageHistoryMapper;
 import com.znaji.stocktracker.client.alphavatage.mapper.AlphaVantageQuoteMapper;
 import com.znaji.stocktracker.exception.StockNotFoundException;
 import com.znaji.stocktracker.exception.StockProviderException;
+import com.znaji.stocktracker.model.StockHistory;
 import com.znaji.stocktracker.model.StockOverview;
 import com.znaji.stocktracker.model.StockQuote;
 import lombok.extern.log4j.Log4j2;
@@ -18,12 +21,14 @@ public class AlphaVatageMarketClient implements StockMarketClient {
 
     private final AlphaVantageProperties properties;
     private final RestClient restClient;
-    private final AlphaVantageQuoteMapper mapper;
+    private final AlphaVantageQuoteMapper quoteMapper;
+    private final AlphaVantageHistoryMapper historyMapper;
 
-    public AlphaVatageMarketClient(AlphaVantageProperties properties, RestClient restClient, AlphaVantageQuoteMapper mapper) {
+    public AlphaVatageMarketClient(AlphaVantageProperties properties, RestClient restClient, AlphaVantageQuoteMapper quoteMapper, AlphaVantageHistoryMapper historyMapper) {
         this.properties = properties;
         this.restClient = restClient;
-        this.mapper = mapper;
+        this.quoteMapper = quoteMapper;
+        this.historyMapper = historyMapper;
     }
 
     @Override
@@ -39,7 +44,7 @@ public class AlphaVatageMarketClient implements StockMarketClient {
                     .retrieve()
                     .body(AlphaVantageQuoteResponse.class);
 
-            return mapper.toStockQuote(alphaVantageQuote);
+            return quoteMapper.toStockQuote(alphaVantageQuote);
         } catch (StockNotFoundException | StockProviderException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -59,12 +64,33 @@ public class AlphaVatageMarketClient implements StockMarketClient {
                             .build())
                     .retrieve()
                     .body(AlphaVantageOverviewResponse.class);
-            return mapper.toStockOverview(alphaVantageResponse);
+            return quoteMapper.toStockOverview(alphaVantageResponse);
 
         } catch (StockNotFoundException | StockProviderException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new StockProviderException("Failed to fetch stock overview for symbol: " + symbol, ex);
         }
+    }
+
+    @Override
+    public StockHistory getStockHistory(String symbol, int days) {
+        try {
+            log.info("Fetching stock history for symbol {} with days {}", symbol, days);            AlphaVantageHistoryResponse response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .queryParam("function", "TIME_SERIES_DAILY")
+                            .queryParam("symbol", symbol)
+                            .queryParam("apikey", properties.getApiKey())
+                            .build())
+                    .retrieve()
+                    .body(AlphaVantageHistoryResponse.class);
+            return historyMapper.toStockHistory(response, days);
+
+        } catch (StockNotFoundException | StockProviderException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new StockProviderException("Failed to fetch stock history for symbol: " + symbol, ex);
+        }
+
     }
 }
