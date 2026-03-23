@@ -25,6 +25,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    @Cacheable(value = "stockOverviews", key = "#symbol.trim().toUpperCase()")
     public StockOverview getStockOverview(String symbol) {
         return stockMarketClient.getStockOverview(getNormalizedSymbol(symbol));
     }

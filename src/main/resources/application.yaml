@@ -8,5 +8,5 @@ spring:
 stock:
   providers:
     alphavantage:
-      api-key: ${ALPHAVANTAGE_API_KEY:}
+      api-key: ${ALPHAVANTAGE_API_KEY:demo}
       base-url: https://www.alphavantage.co/query
