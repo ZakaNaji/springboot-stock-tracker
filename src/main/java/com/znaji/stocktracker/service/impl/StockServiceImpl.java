@@ -1,8 +1,10 @@
 package com.znaji.stocktracker.service.impl;
 
 import com.znaji.stocktracker.client.StockMarketClient;
+import com.znaji.stocktracker.model.StockOverview;
 import com.znaji.stocktracker.model.StockQuote;
 import com.znaji.stocktracker.service.StockService;
+import org.jspecify.annotations.NonNull;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,16 @@ public class StockServiceImpl implements StockService {
     @Override
     @Cacheable(value = "stockQuotes", key = "#symbol.trim().toUpperCase()")
     public StockQuote getStockQuote(String symbol) {
-        var normalizedSymbol = symbol.trim().toUpperCase();
+        var normalizedSymbol = getNormalizedSymbol(symbol);
         return stockMarketClient.getStockQuote(normalizedSymbol);
+    }
+
+    @Override
+    public StockOverview getStockOverview(String symbol) {
+        return stockMarketClient.getStockOverview(getNormalizedSymbol(symbol));
+    }
+
+    private String getNormalizedSymbol(String symbol) {
+        return symbol.trim().toUpperCase();
     }
 }
