@@ -1,6 +1,7 @@
 package com.znaji.stocktracker.service.impl;
 
 import com.znaji.stocktracker.client.StockMarketClient;
+import com.znaji.stocktracker.model.StockHistory;
 import com.znaji.stocktracker.model.StockOverview;
 import com.znaji.stocktracker.model.StockQuote;
 import com.znaji.stocktracker.service.StockService;
@@ -29,6 +30,13 @@ public class StockServiceImpl implements StockService {
     public StockOverview getStockOverview(String symbol) {
         return stockMarketClient.getStockOverview(getNormalizedSymbol(symbol));
     }
+
+    @Override
+    @Cacheable(value = "stockHistories", key = "#symbol.trim().toUpperCase() + '_' + #days")
+    public StockHistory getStockHistory(String symbol, int days) {
+        return stockMarketClient.getStockHistory(getNormalizedSymbol(symbol), days);
+    }
+
 
     private String getNormalizedSymbol(String symbol) {
         return symbol.trim().toUpperCase();
