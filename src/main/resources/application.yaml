@@ -10,3 +10,9 @@ stock:
     alphavantage:
       api-key: ${ALPHAVANTAGE_API_KEY:demo}
       base-url: https://www.alphavantage.co/query
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, caches
