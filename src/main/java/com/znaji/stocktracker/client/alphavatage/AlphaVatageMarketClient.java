@@ -1,5 +1,6 @@
 package com.znaji.stocktracker.client.alphavatage;
 
+import com.znaji.stocktracker.client.StockClientProperties;
 import com.znaji.stocktracker.client.StockMarketClient;
 import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageHistoryResponse;
 import com.znaji.stocktracker.client.alphavatage.dto.AlphaVantageOverviewResponse;
@@ -12,23 +13,25 @@ import com.znaji.stocktracker.model.StockHistory;
 import com.znaji.stocktracker.model.StockOverview;
 import com.znaji.stocktracker.model.StockQuote;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
 @Log4j2
+@ConditionalOnProperty(name = "stock.provider", havingValue = "alphavantage")
 public class AlphaVatageMarketClient implements StockMarketClient {
 
-    private final AlphaVantageProperties properties;
+    private final StockClientProperties.ProviderProperty properties;
     private final RestClient restClient;
     private final AlphaVantageQuoteMapper quoteMapper;
     private final AlphaVantageHistoryMapper historyMapper;
 
-    public AlphaVatageMarketClient(AlphaVantageProperties properties, RestClient restClient, AlphaVantageQuoteMapper quoteMapper, AlphaVantageHistoryMapper historyMapper) {
-        this.properties = properties;
+    public AlphaVatageMarketClient(StockClientProperties clientConfig, RestClient restClient, AlphaVantageQuoteMapper quoteMapper, AlphaVantageHistoryMapper historyMapper) {
         this.restClient = restClient;
         this.quoteMapper = quoteMapper;
         this.historyMapper = historyMapper;
+        this.properties = clientConfig.getProviders().get("alphavantage");
     }
 
     @Override
