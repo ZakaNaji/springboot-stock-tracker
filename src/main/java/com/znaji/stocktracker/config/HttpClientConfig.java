@@ -18,4 +18,12 @@ public class HttpClientConfig {
                 .baseUrl(properties.getProviders().get("alphavantage").getBaseUrl())
                 .build();
     }
+
+    @Bean
+    @ConditionalOnProperty(name = "stock.provider", havingValue = "fmp")
+    public RestClient fmpRestClient(StockClientProperties properties) {
+        return RestClient.builder()
+                .baseUrl(properties.getProviders().get("fmp").getBaseUrl())
+                .build();
+    }
 }
