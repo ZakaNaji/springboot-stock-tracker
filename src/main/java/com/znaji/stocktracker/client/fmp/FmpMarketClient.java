@@ -2,8 +2,10 @@ package com.znaji.stocktracker.client.fmp;
 
 import com.znaji.stocktracker.client.StockClientProperties;
 import com.znaji.stocktracker.client.StockMarketClient;
+import com.znaji.stocktracker.client.fmp.dto.FmpQuoteOverviewResponse;
 import com.znaji.stocktracker.client.fmp.dto.FmpQuoteResponse;
 import com.znaji.stocktracker.client.fmp.mapper.FmpQuoteMapper;
+import com.znaji.stocktracker.client.fmp.mapper.FmpQuoteOverviewMapper;
 import com.znaji.stocktracker.exception.StockNotFoundException;
 import com.znaji.stocktracker.exception.StockProviderException;
 import com.znaji.stocktracker.model.StockHistory;
@@ -20,11 +22,13 @@ import org.springframework.web.client.RestClient;
 public class FmpMarketClient implements StockMarketClient {
     private final RestClient restClient;
     private final FmpQuoteMapper quoteMapper;
+    private final FmpQuoteOverviewMapper overviewMapper;
     private final StockClientProperties.ProviderProperty properties;
 
-    public FmpMarketClient(RestClient restClient, FmpQuoteMapper quoteMapper, StockClientProperties config) {
+    public FmpMarketClient(RestClient restClient, FmpQuoteMapper quoteMapper, FmpQuoteOverviewMapper overviewMapper, StockClientProperties config) {
         this.restClient = restClient;
         this.quoteMapper = quoteMapper;
+        this.overviewMapper = overviewMapper;
         this.properties = config.getProviders().get("fmp");
     }
 
@@ -52,7 +56,26 @@ public class FmpMarketClient implements StockMarketClient {
 
     @Override
     public StockOverview getStockOverview(String symbol) {
-        return null;
+        try {
+            log.info("[FMP] Fetching stock overview for symbol: {}", symbol);
+            // FMP doesn't have a separate endpoint for overview, so we can reuse the quote endpoint
+            var response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/quote")
+                            .queryParam("symbol", symbol)
+                            .queryParam("apikey", properties.getApiKey())
+                            .build())
+                    .retrieve()
+                    .body(FmpQuoteOverviewResponse[].class);
+
+            return overviewMapper.toStockOverview(response[0]);
+        } catch (StockNotFoundException | StockProviderException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new StockProviderException("Failed to fetch stock overview for symbol: " + symbol, ex);
+        }
+
+
     }
 
     @Override
